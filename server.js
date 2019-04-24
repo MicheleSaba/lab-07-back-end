@@ -6,7 +6,7 @@ const express = require('express'),
   app = express(),
   PORT = process.env.PORT || 3000,
   superagent = require('superagent');
-
+app.use(cors());
 // CREATE LOCATION ROUTE
 app.get('/location', (request, response) => {
   // STORE THE USER'S QUERY-TURNED-LOCATION-OBJECT IN LOCATIONDATA
