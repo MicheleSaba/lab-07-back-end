@@ -36,14 +36,12 @@ function Location(query, res) {
 // RETURN ALL WEATHER RECORDS FOR THE USER'S LOCATION QUERY
 const getWeather = () => {
   const darkskyData = require('./data/darksky.json');
-  const weatherSummaries = [];
-
-  darkskyData.daily.data.forEach(day => {
-    weatherSummaries.push(new Weather(day));
+  
+  return darkskyData.daily.data.map(day => {
+    return new Weather(day);
   });
+}
 
-  return weatherSummaries;
-};
 
 function Weather(day) {
   this.forecast = day.summary,
