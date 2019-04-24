@@ -10,20 +10,16 @@ const cors = require('cors');
 
 app.use(cors());
 
-let locationData = {};
-let weatherData = {};
-
 // CREATE LOCATION ROUTE
 app.get('/location', (request, response) => {
   // STORE THE USER'S QUERY-TURNED-LOCATION-OBJECT IN LOCATIONDATA
   searchToLatLong(request, response);
-  response.send(locationData);
 });
 
 // CREATE WEATHER ROUTE
 app.get('/weather', (request, response) => {
   // STORE THE USER'S QUERY LOCATION 
-  getWeather(searchToLatLong(request, response), response);
+  getWeather(request, response);
 });
 
 // CREATE A NEW LOCATION OBJECT FOR THE USER'S QUERY
@@ -32,9 +28,9 @@ const searchToLatLong = function(request, response) {
 
   return superagent.get(url)
     .then(res => {
-      locationData = new Location(request.query.data, res);
+      response.send(new Location(request.query.data, res));
     }).catch(error => {
-      console.log('1');
+      console.log(error);
       response.status(500).send("Internal Server Error");
     }) 
 };
@@ -53,17 +49,17 @@ function Location(query, res) {
 // RETURN ALL WEATHER RECORDS FOR THE USER'S LOCATION QUERY
 const getWeather = function(request, response) {
   //const darkskyData = require('./data/darksky.json');
-  let url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.lat},${request.lng}`;
+  let url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.query.lat},${request.query.lng}`;
   //let url = `https://api.darksky.net/forecast/d014db8157816772e1553d6da93c8fc8/41.8781136,-87.6297982`;
   return superagent.get(url)
     .then(res => {
       response.send(res.body.daily.data.map(day => {
         return new Weather(day);
-      })).catch(error => {
+      }))
+    }).catch(error => {
       console.log(error);
       response.status(500).send('Internal Server Error')
-      });
-    });
+      });;
 }
 
 
