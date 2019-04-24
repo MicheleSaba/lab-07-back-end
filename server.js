@@ -4,36 +4,34 @@ require('dotenv').config();
 
 const express = require('express'),
   app = express(),
-  PORT = process.env.PORT || 3000;
+  PORT = process.env.PORT || 3000,
+  superagent = require('superagent');
 
 // CREATE LOCATION ROUTE
-app.get('/location', (req, res) => {
+app.get('/location', (request, response) => {
   // STORE THE USER'S QUERY-TURNED-LOCATION-OBJECT IN LOCATIONDATA
-  const locationData = searchToLatLong(req.query.data);
-  // RETURN THE LOCATION OBJECT
-  res.send(locationData);
+  searchToLatLong(request, response);
 });
 
 // CREATE WEATHER ROUTE
-app.get('/weather', (req, res) => {
+app.get('/weather', (request, response) => {
   // STORE THE USER'S QUERY LOCATION 
-  const weatherData = getWeather();
-  res.send(weatherData);
+  getWeather();
 });
 
 // CREATE A NEW LOCATION OBJECT FOR THE USER'S QUERY
-const searchToLatLong = query => {
+const searchToLatLong = function(request, response) {
   let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
   // const location = new Location(query, geoData);
   // return location;
   return superagent.get(url)
     .then(res => {
-      Response.send(new Location(request.query.data, res));
+      console.log(request.query.data);
+      response.send(new Location(request.query.data, res));
     }).catch(error => {
       console.log(error);
       response.status(500).send("Internal server error");
     }) 
-
 };
 
 
@@ -41,10 +39,10 @@ const searchToLatLong = query => {
 // +Mountain+View,+CA&key=YOUR_API_KEY
 
 function Location(query, res) {
-  this.query = query,
-  this.formatted_query = res.results[0].formatted_address,
-  this.latitude = res.results[0].geometry.location.lat,
-  this.longitude = res.results[0].geometry.location.lng;
+  this.query = query;
+  this.formatted_query = res.body.results[0].formatted_address;
+  this.latitude = res.body.results[0].geometry.location.lat;
+  this.longitude = res.body.results[0].geometry.location.lng;
 }
 
 // RETURN ALL WEATHER RECORDS FOR THE USER'S LOCATION QUERY
