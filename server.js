@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config();
+
 const express = require('express'),
   app = express(),
   PORT = process.env.PORT || 3000;
@@ -21,10 +23,22 @@ app.get('/weather', (req, res) => {
 
 // CREATE A NEW LOCATION OBJECT FOR THE USER'S QUERY
 const searchToLatLong = query => {
-  const geoData = require('./data/geo.json');
-  const location = new Location(query, geoData);
-  return location;
+  let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
+  // const location = new Location(query, geoData);
+  // return location;
+  return superagent.get(url)
+    .then(res => {
+      Response.send(new Location(request.query.data, res));
+    }).catch(error => {
+      console.log(error);
+      response.status(500).send("Internal server error");
+    }) 
+
 };
+
+
+// https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,
+// +Mountain+View,+CA&key=YOUR_API_KEY
 
 function Location(query, res) {
   this.query = query,
