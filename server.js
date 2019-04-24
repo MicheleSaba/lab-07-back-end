@@ -2,11 +2,14 @@
 
 require('dotenv').config();
 
-const express = require('express'),
-  app = express(),
-  PORT = process.env.PORT || 3000,
-  superagent = require('superagent');
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 3000;
+const superagent = require('superagent');
+const cors = require('cors');
+
 app.use(cors());
+
 // CREATE LOCATION ROUTE
 app.get('/location', (request, response) => {
   // STORE THE USER'S QUERY-TURNED-LOCATION-OBJECT IN LOCATIONDATA
