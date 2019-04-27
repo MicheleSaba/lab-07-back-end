@@ -19,7 +19,7 @@ app.get('/location', (request, response) => {
 // CREATE WEATHER ROUTE
 app.get('/weather', (request, response) => {
   // STORE THE USER'S QUERY LOCATION 
-  getWeather(request, response);
+  getWeather(request.query.data, response);
 });
 
 // CREATE A NEW LOCATION OBJECT FOR THE USER'S QUERY
@@ -35,10 +35,6 @@ const searchToLatLong = function(request, response) {
     }) 
 };
 
-
-// https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,
-// +Mountain+View,+CA&key=YOUR_API_KEY
-
 function Location(query, res) {
   this.query = query;
   this.formatted_query = res.body.results[0].formatted_address;
@@ -49,8 +45,8 @@ function Location(query, res) {
 // RETURN ALL WEATHER RECORDS FOR THE USER'S LOCATION QUERY
 const getWeather = function(request, response) {
   //const darkskyData = require('./data/darksky.json');
-  let url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.query.lat},${request.query.lng}`;
-  //let url = `https://api.darksky.net/forecast/d014db8157816772e1553d6da93c8fc8/41.8781136,-87.6297982`;
+  let url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.lat},${request.lng}`;
+  //let url = `https://api.darksky.net/forecast/d014db8157816772e1553d6da93c8fc8/87.6297982,-87.6297982`;
   return superagent.get(url)
     .then(res => {
       response.send(res.body.daily.data.map(day => {
@@ -58,7 +54,7 @@ const getWeather = function(request, response) {
       }))
     }).catch(error => {
       console.log(error);
-      response.status(500).send('Internal Server Error')
+      response.status(500).send('Internal Server Error_Weather')
       });;
 }
 
